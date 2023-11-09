@@ -12,7 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-public class GameEx: IGameEx {
+public class Game: IGame {
 
     public GameSettings Settings { get; set; }
     protected GameResourceCacheFile ResourceCacheFile = new GameResourceCacheFile();
@@ -29,7 +29,7 @@ public class GameEx: IGameEx {
     /// <inheritdoc />
     public event EventHandler<GameState> OnStateUpdate = delegate {};
 
-    public GameEx(GameSettings settings) {
+    public Game(GameSettings settings) {
 
         this.Settings = settings;
         

@@ -12,7 +12,7 @@ using System.Security.Cryptography;
 
 public class GameIntegrityManager: IGameIntegrityManager {
 
-    private IGameEx _Game;
+    private IGame _Game;
     
     private GameIntegrityManagerState _State;
     public GameIntegrityManagerState State {
@@ -23,16 +23,16 @@ public class GameIntegrityManager: IGameIntegrityManager {
         }
     }
 
-    public GameIntegrityManager(IGameEx game) => this._Game = game;
+    public GameIntegrityManager(IGame game) => this._Game = game;
 
     /// <inheritdoc />
     public event EventHandler<GameIntegrityManagerState> OnStateUpdate = delegate {};
     
     /// <inheritdoc />
-    public virtual async Task<List<GameFileIntegrityReportEx>> GetInstallationIntegrityReportAsync() => await this.GetInstallationIntegrityReportAsync(null, CancellationToken.None);
+    public virtual async Task<List<GameFileIntegrityReport>> GetInstallationIntegrityReportAsync() => await this.GetInstallationIntegrityReportAsync(null, CancellationToken.None);
     
     /// <inheritdoc />
-    public virtual async Task<List<GameFileIntegrityReportEx>> GetInstallationIntegrityReportAsync(ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
+    public virtual async Task<List<GameFileIntegrityReport>> GetInstallationIntegrityReportAsync(ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
         GameIntegrityManagerState previousState = this.State;
 
@@ -42,7 +42,7 @@ public class GameIntegrityManager: IGameIntegrityManager {
             Logger.GetInstance().Log($"Starting game integrity check...");
 
             var entries = new List<GamePkgVersionEntry>();
-            var mismatches = new List<GameFileIntegrityReportEx>();
+            var mismatches = new List<GameFileIntegrityReport>();
             double pkgVersionTotalPackageSize = 0;
             double totalBytesRead = 0;
             List<double> estimatedRemainingTime = new List<double>();
@@ -65,7 +65,7 @@ public class GameIntegrityManager: IGameIntegrityManager {
 
                     if (localHash.ToUpper() != currentEntry.md5.ToUpper()) {
 
-                        mismatches.Add(new GameFileIntegrityReportEx {
+                        mismatches.Add(new GameFileIntegrityReport {
 
                             State = GameFileIntegrityState.CORRUPTED,
                             Path = currentEntry.remoteName,
@@ -83,7 +83,7 @@ public class GameIntegrityManager: IGameIntegrityManager {
 
                 } else {
 
-                    mismatches.Add(new GameFileIntegrityReportEx {
+                    mismatches.Add(new GameFileIntegrityReport {
 
                         State = GameFileIntegrityState.MISSING,
                         Path = currentEntry.remoteName,
@@ -147,13 +147,13 @@ public class GameIntegrityManager: IGameIntegrityManager {
     }
     
     /// <inheritdoc />
-    public virtual async Task<List<GameFileIntegrityReportEx>> RepairInstallationAsync(List<GameFileIntegrityReportEx> reports, CancellationToken token = default) => await this.RepairInstallationAsync(reports, null, token);
+    public virtual async Task<List<GameFileIntegrityReport>> RepairInstallationAsync(List<GameFileIntegrityReport> reports, CancellationToken token = default) => await this.RepairInstallationAsync(reports, null, token);
     
     /// <inheritdoc />
-    public virtual async Task<List<GameFileIntegrityReportEx>> RepairInstallationAsync(List<GameFileIntegrityReportEx> reports, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
+    public virtual async Task<List<GameFileIntegrityReport>> RepairInstallationAsync(List<GameFileIntegrityReport> reports, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
         GameIntegrityManagerState previousState = this.State;
-        List<GameFileIntegrityReportEx> fixedList = new List<GameFileIntegrityReportEx>();
+        List<GameFileIntegrityReport> fixedList = new List<GameFileIntegrityReport>();
 
         try {
 
@@ -182,7 +182,7 @@ public class GameIntegrityManager: IGameIntegrityManager {
 
                     Logger.GetInstance().Log($"Successfully repaired the game file \"{localFilePath}\"");
                     
-                    fixedList.Add(new GameFileIntegrityReportEx {
+                    fixedList.Add(new GameFileIntegrityReport {
 
                         State = GameFileIntegrityState.OK,
                         Path = reports[i].Path,

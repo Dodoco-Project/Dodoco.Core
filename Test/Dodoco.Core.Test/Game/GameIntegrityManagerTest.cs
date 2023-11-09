@@ -29,14 +29,14 @@ public class GameIntegrityManagerTest {
     [Test]
     public async Task GameIntegrityManager_GetInstallationIntegrityReportAsync_Test() {
 
-        IGameEx game = new GameEx(settings);
+        IGame game = new Game(settings);
         Mock<GameIntegrityManager> mock = new Mock<GameIntegrityManager>(game);
         mock.CallBase = true; // Methods who are not present in the setup should fallback to base implementation
         mock.Setup(m => m.GetPkgVersionAsync()).Returns(
             Task.FromResult(PkgVersionParser.Parse(pkg_version))
         );
 
-        List<GameFileIntegrityReportEx> filesToFix = await mock.Object.GetInstallationIntegrityReportAsync();
+        List<GameFileIntegrityReport> filesToFix = await mock.Object.GetInstallationIntegrityReportAsync();
 
         Assert.IsTrue(filesToFix.Exists(someFile =>
             someFile.State == GameFileIntegrityState.MISSING
@@ -79,15 +79,15 @@ public class GameIntegrityManagerTest {
         
         FileSystem.CopyDirectory(Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, SOURCE_DIRECTORY), Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, TARGET_DIRECTORY), true);
         
-        IGameEx game = new GameEx(settings);
+        IGame game = new Game(settings);
         Mock<GameIntegrityManager> mock = new Mock<GameIntegrityManager>(game);
         mock.CallBase = true; // Methods who are not present in the setup should fallback to base implementation
         mock.Setup(m => m.GetPkgVersionAsync()).Returns(
             Task.FromResult(PkgVersionParser.Parse(pkg_version))
         );
 
-        List<GameFileIntegrityReportEx> filesToFix = await mock.Object.GetInstallationIntegrityReportAsync();
-        List<GameFileIntegrityReportEx> fixedFiles = await mock.Object.RepairInstallationAsync(filesToFix);
+        List<GameFileIntegrityReport> filesToFix = await mock.Object.GetInstallationIntegrityReportAsync();
+        List<GameFileIntegrityReport> fixedFiles = await mock.Object.RepairInstallationAsync(filesToFix);
         
         // If we check the installation again, there should be no missing/corrupted files
         

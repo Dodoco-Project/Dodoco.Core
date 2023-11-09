@@ -17,7 +17,7 @@ using System.Security.Cryptography;
 public class GameUpdateManagerTest {
 
     private GameSettings Settings;
-    private IGameEx Game;
+    private IGame Game;
 
     private static object[] GetGameUpdateAsync_Test_Cases = {
         new object[] { GameServer.Chinese },
@@ -40,7 +40,7 @@ public class GameUpdateManagerTest {
     public void Init() {
 
         this.Settings = new GameSettings();
-        this.Game = new GameEx(this.Settings);
+        this.Game = new Game(this.Settings);
 
     }
 
@@ -66,7 +66,7 @@ public class GameUpdateManagerTest {
 
         };
 
-        Mock<GameEx> gameMock = new Mock<GameEx>(settings);
+        Mock<Game> gameMock = new Mock<Game>(settings);
         gameMock.CallBase = true;
         // Lets assume the game is installed
         gameMock.Setup(m => m.CheckGameInstallation()).Returns(true);
@@ -110,7 +110,7 @@ public class GameUpdateManagerTest {
 
         };
 
-        Mock<GameEx> gameMock = new Mock<GameEx>(settings);
+        Mock<Game> gameMock = new Mock<Game>(settings);
         gameMock.CallBase = true;
         // Lets assume the game is installed
         gameMock.Setup(m => m.CheckGameInstallation()).Returns(true);
@@ -274,7 +274,7 @@ public class GameUpdateManagerTest {
 
         Mock<GameIntegrityManager> integrityManagerMock = new Mock<GameIntegrityManager>(this.Game);
         integrityManagerMock.CallBase = true;
-        integrityManagerMock.Setup(m => m.GetInstallationIntegrityReportAsync()).Returns(Task.FromResult(new List<GameFileIntegrityReportEx>()));
+        integrityManagerMock.Setup(m => m.GetInstallationIntegrityReportAsync()).Returns(Task.FromResult(new List<GameFileIntegrityReport>()));
 
         Assert.That(async () => await updateManagerMock.Object.UpdateGameAsync(integrityManagerMock.Object), Throws.Exception.TypeOf<GameException>());
 

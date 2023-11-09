@@ -4,7 +4,7 @@ using Dodoco.Core.Network.Api.Company;
 using Dodoco.Core.Protocol.Company.Launcher.Resource;
 using Dodoco.Core.Wine;
 
-public interface IGameEx: IStatefulEntity<GameState> {
+public interface IGame: IStatefulEntity<GameState> {
 
     GameSettings Settings { get; set; }
 

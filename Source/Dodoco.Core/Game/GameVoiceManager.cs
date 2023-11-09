@@ -7,9 +7,9 @@ using Dodoco.Core.Util.Log;
 /// </summary>
 public class GameVoiceManager: IGameVoiceManager {
 
-    private IGameEx Game;
+    private IGame Game;
     
-    public GameVoiceManager(IGameEx game) => this.Game = game;
+    public GameVoiceManager(IGame game) => this.Game = game;
 
     /// <inheritdoc />
     public virtual IEnumerable<GameLanguage> GetInstalledVoices() {

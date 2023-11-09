@@ -14,7 +14,7 @@ using System.Text.RegularExpressions;
 
 public class GameUpdateManager: IGameUpdateManager {
 
-    private IGameEx _Game;
+    private IGame _Game;
     
     private GameUpdateManagerState _State;
     public GameUpdateManagerState State {
@@ -28,7 +28,7 @@ public class GameUpdateManager: IGameUpdateManager {
     /// <inheritdoc />
     public event EventHandler<GameUpdateManagerState> OnStateUpdate = delegate {};
 
-    public GameUpdateManager(IGameEx game) => this._Game = game;
+    public GameUpdateManager(IGame game) => this._Game = game;
 
     /// <summary>
     /// Reads the game's update package <see cref="T:Dodoco.Core.Game.GameHdiffFiles"/> file

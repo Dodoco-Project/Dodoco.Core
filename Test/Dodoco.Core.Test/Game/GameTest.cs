@@ -9,14 +9,14 @@ using Dodoco.Core.Serialization.Json;
 using NUnit.Framework;
 
 [TestFixture]
-public class GameExTest {
+public class GameTest {
 
     private GameSettings Settings;
-    private IGameEx Game;
+    private IGame Game;
 
     private static object[] CheckGameInstallation_Cases = {
-        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/CheckGameInstallation_Test"), true },
-        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/CheckGameInstallation_Test"), true },
+        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/CheckGameInstallation_Test"), true },
+        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/CheckGameInstallation_Test"), true },
         new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, Guid.NewGuid().ToString()), false },
         new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, Guid.NewGuid().ToString()), false }
     };
@@ -37,13 +37,13 @@ public class GameExTest {
     };
 
     private static object[] GetGameVersionAsync_GlobalGameManagers_Cases = {
-        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/GetGameVersionAsync_GlobalGameManagers_Test"), Version.Parse("4.1.0") },
-        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/GetGameVersionAsync_GlobalGameManagers_Test"), Version.Parse("4.1.0") }
+        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/GetGameVersionAsync_GlobalGameManagers_Test"), Version.Parse("4.1.0") },
+        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/GetGameVersionAsync_GlobalGameManagers_Test"), Version.Parse("4.1.0") }
     };
 
     private static object[] GetGameVersionAsync_UnityPlayer_Cases = {
-        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/GetGameVersionAsync_UnityPlayer_Test"), Version.Parse("4.1.0") },
-        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/GetGameVersionAsync_UnityPlayer_Test"), Version.Parse("4.1.0") }
+        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/GetGameVersionAsync_UnityPlayer_Test"), Version.Parse("4.1.0") },
+        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/GetGameVersionAsync_UnityPlayer_Test"), Version.Parse("4.1.0") }
     };
 
     private static object[] GetGameVersionAsync_Remote_Cases = {
@@ -57,8 +57,8 @@ public class GameExTest {
     };
 
     private static object[] GetResource_Outdated_Test_Cases = {
-        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/GetResource_Outdated_Test") },
-        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/GetResource_Outdated_Test") }
+        new object[] { GameServer.Chinese, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/GetResource_Outdated_Test") },
+        new object[] { GameServer.Global, Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/GetResource_Outdated_Test") }
     };
 
     private static object[] UpdateGameResourceCache_Test_Cases = {
@@ -70,7 +70,7 @@ public class GameExTest {
     public void Init() {
 
         this.Settings = new GameSettings();
-        this.Game = new GameEx(this.Settings);
+        this.Game = new Game(this.Settings);
 
     }
 
@@ -165,7 +165,7 @@ public class GameExTest {
 
         Version targetTestVersion = Version.Parse("3.8.0");
         this.Game.Settings.Server = server;
-        this.Game.Settings.InstallationDirectory = Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameExTest/UpdateGameResourceCache_Test");
+        this.Game.Settings.InstallationDirectory = Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameTest/UpdateGameResourceCache_Test");
         
         GameResourceCacheFile resourceCacheFile = new GameResourceCacheFile();
         Predicate<GameResourceCache> desiredCacheEntry = new Predicate<GameResourceCache>(e =>

@@ -12,7 +12,7 @@ using System.Security.Cryptography;
 
 public class GameInstallationManager: IGameInstallationManager {
 
-    private IGameEx _Game;
+    private IGame _Game;
 
     private GameInstallationManagerState _State;
     public GameInstallationManagerState State {
@@ -26,7 +26,7 @@ public class GameInstallationManager: IGameInstallationManager {
     /// <inheritdoc />
     public event EventHandler<GameInstallationManagerState> OnStateUpdate = delegate {};
 
-    public GameInstallationManager(IGameEx game) => this._Game = game;
+    public GameInstallationManager(IGame game) => this._Game = game;
 
     /// <inheritdoc />
     public virtual async Task<long> GetGamePackageDownloadSize() {

@@ -1,6 +1,6 @@
 namespace Dodoco.Core.Game {
 
-    public struct GameFileIntegrityReportEx {
+    public struct GameFileIntegrityReport {
 
         public GameFileIntegrityState State { get; init; }
         public string Path { get; init; }
