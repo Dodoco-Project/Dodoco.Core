@@ -186,7 +186,7 @@ namespace Dodoco.Core.Network.WebSocket {
 
                     }
 
-                } catch (JsonException e) {
+                } catch (JsonException) {
 
                     // Do not report any erros
 
