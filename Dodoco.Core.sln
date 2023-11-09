@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Source", "Source", "{16B90EAC-23E4-4BB3-B769-D0BC6079DD8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodoco.Core", "Source\Dodoco.Core\Dodoco.Core.csproj", "{5C0736DB-0C7A-40AF-8A1E-4D6F80B1B97B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{E96BA084-120F-4A37-89C2-DFAC3CA6280B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodoco.Core.Test", "Test\Dodoco.Core.Test\Dodoco.Core.Test.csproj", "{0C0B8586-6CD5-422C-9F30-D85ADB85762A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5C0736DB-0C7A-40AF-8A1E-4D6F80B1B97B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C0736DB-0C7A-40AF-8A1E-4D6F80B1B97B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C0736DB-0C7A-40AF-8A1E-4D6F80B1B97B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C0736DB-0C7A-40AF-8A1E-4D6F80B1B97B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C0B8586-6CD5-422C-9F30-D85ADB85762A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C0B8586-6CD5-422C-9F30-D85ADB85762A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C0B8586-6CD5-422C-9F30-D85ADB85762A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C0B8586-6CD5-422C-9F30-D85ADB85762A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{5C0736DB-0C7A-40AF-8A1E-4D6F80B1B97B} = {16B90EAC-23E4-4BB3-B769-D0BC6079DD8F}
+		{0C0B8586-6CD5-422C-9F30-D85ADB85762A} = {E96BA084-120F-4A37-89C2-DFAC3CA6280B}
+	EndGlobalSection
+EndGlobal
