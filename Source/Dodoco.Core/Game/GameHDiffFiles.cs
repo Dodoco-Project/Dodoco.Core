@@ -3,22 +3,22 @@ using Dodoco.Core.Serialization.Json;
 
 namespace Dodoco.Core.Game {
 
-    public class GameHdiffFiles: WritableManagedFile<List<GameHdiffFilesEntry>> {
+    public class GameHDiffFiles: WritableManagedFile<List<GameHDiffFilesEntry>> {
 
-        public GameHdiffFiles(string gameInstallationDirectory): base(
+        public GameHDiffFiles(string gameInstallationDirectory): base(
             "hdifffiles",
             gameInstallationDirectory,
             "hdifffiles.txt"
         ) {}
 
-        public override List<GameHdiffFilesEntry> Read() {
+        public override List<GameHDiffFilesEntry> Read() {
 
-            List<GameHdiffFilesEntry> result = new List<GameHdiffFilesEntry>();
+            List<GameHDiffFilesEntry> result = new List<GameHDiffFilesEntry>();
             IFormatSerializer serializer = new JsonSerializer();
 
             foreach (string line in File.ReadAllLines(this.FullPath)) {
 
-                result.Add(serializer.Deserialize<GameHdiffFilesEntry>(line));
+                result.Add(serializer.Deserialize<GameHDiffFilesEntry>(line));
 
             }
 
@@ -26,7 +26,7 @@ namespace Dodoco.Core.Game {
 
         }
 
-        public override void Write(List<GameHdiffFilesEntry> content) {
+        public override void Write(List<GameHDiffFilesEntry> content) {
 
             throw new NotSupportedException();
 

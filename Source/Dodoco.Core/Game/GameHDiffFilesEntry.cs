@@ -1,6 +1,6 @@
 namespace Dodoco.Core.Game {
 
-    public struct GameHdiffFilesEntry {
+    public struct GameHDiffFilesEntry {
 
         public string remoteName { get; set; }
 

@@ -36,7 +36,7 @@ public class GameUpdateManager: IGameUpdateManager {
     /// </summary>
     protected virtual async void ApplyGameUpdatePackagePatches(ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        GameHdiffFiles hdiffFilesHandler = new GameHdiffFiles(this._Game.Settings.InstallationDirectory);
+        GameHDiffFiles hdiffFilesHandler = new GameHDiffFiles(this._Game.Settings.InstallationDirectory);
 
         if (!hdiffFilesHandler.Exist())
             return;
@@ -54,7 +54,7 @@ public class GameUpdateManager: IGameUpdateManager {
 
             GameHDiffPatcher patcher = new GameHDiffPatcher();
             int appliedPatchesCount = 0;
-            List<GameHdiffFilesEntry> patchesList = hdiffFilesHandler.Read();
+            List<GameHDiffFilesEntry> patchesList = hdiffFilesHandler.Read();
 
             await Parallel.ForEachAsync(patchesList, async (entry, token) => {
 
@@ -375,7 +375,7 @@ public class GameUpdateManager: IGameUpdateManager {
              * Removes old update package's files
             */
 
-            GameHdiffFiles hdiffFilesHandler = new GameHdiffFiles(this._Game.Settings.InstallationDirectory);
+            GameHDiffFiles hdiffFilesHandler = new GameHDiffFiles(this._Game.Settings.InstallationDirectory);
             GameDeleteFiles deleteFilesHandler = new GameDeleteFiles(this._Game.Settings.InstallationDirectory);
 
             if (hdiffFilesHandler.Exist())
