@@ -51,7 +51,7 @@ public class GameUpdateManagerTest {
         this.Game.Settings.Server = server;
         this.Game.Settings.InstallationDirectory = Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, Guid.NewGuid().ToString());
 
-        IGameUpdateManager updateManager = new GameUpdateManager(this.Game);
+        IGameUpdateManager updateManager = GameUpdateManagerFactory.Create(this.Game);
         Assert.IsNull(await updateManager.GetGameUpdateAsync());
 
     }
@@ -95,7 +95,7 @@ public class GameUpdateManagerTest {
         gameMock.Setup(m => m.GetGameVersionAsync()).Returns(Task<ResourceResponse>.FromResult(Version.Parse(UPDATED_VERSION)));
         gameMock.Setup(m => m.GetApiFactory()).Returns(apiFactoryMock.Object);
 
-        IGameUpdateManager updateManager = new GameUpdateManager(gameMock.Object);
+        IGameUpdateManager updateManager = GameUpdateManagerFactory.Create(gameMock.Object);
         Assert.That(await updateManager.GetGameUpdateAsync(), Is.Null);
 
     }
@@ -138,7 +138,7 @@ public class GameUpdateManagerTest {
         gameMock.Setup(m => m.GetGameVersionAsync()).Returns(Task<ResourceResponse>.FromResult(Version.Parse("3.8.0")));
         gameMock.Setup(m => m.GetApiFactory()).Returns(apiFactoryMock.Object);
 
-        IGameUpdateManager updateManager = new GameUpdateManager(gameMock.Object);
+        IGameUpdateManager updateManager = GameUpdateManagerFactory.Create(gameMock.Object);
         IFormatSerializer serializer = new JsonSerializer();
         Assert.That(serializer.Serialize(await updateManager.GetGameUpdateAsync()), Is.EqualTo(serializer.Serialize(res.data.game)));
 
