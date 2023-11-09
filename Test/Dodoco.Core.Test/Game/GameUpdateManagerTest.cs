@@ -254,7 +254,7 @@ public class GameUpdateManagerTest {
     }
 
     [Test, Description("UpdateGameAsync should throw an exception when unable to find a diff object whose name matchs the string pattern")]
-    public async Task UpdateGameAsync_Unable_To_Find_Diff_Test() {
+    public void UpdateGameAsync_Unable_To_Find_Diff_Test() {
 
         this.Game.Settings.Server = GameServer.Global;
         this.Game.Settings.InstallationDirectory = Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameUpdateManagerTest/", "Generic_Installation");
@@ -281,7 +281,7 @@ public class GameUpdateManagerTest {
     }
 
     [Test, Description("PreUpdateGameAsync should throw an exception when unable to find a diff object whose name matchs the string pattern")]
-    public async Task PreUpdateGameAsync_Unable_To_Find_Diff_Test() {
+    public void PreUpdateGameAsync_Unable_To_Find_Diff_Test() {
 
         this.Game.Settings.Server = GameServer.Global;
         this.Game.Settings.InstallationDirectory = Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, "/Game/GameUpdateManagerTest/", "Generic_Installation");
