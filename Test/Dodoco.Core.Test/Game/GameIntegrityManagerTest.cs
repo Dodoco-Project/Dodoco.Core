@@ -29,7 +29,7 @@ public class GameIntegrityManagerTest {
     [Test]
     public async Task GameIntegrityManager_GetInstallationIntegrityReportAsync_Test() {
 
-        IGame game = new Game(settings);
+        IGame game = GameFactory.Create(settings);
         Mock<GameIntegrityManager> mock = new Mock<GameIntegrityManager>(game);
         mock.CallBase = true; // Methods who are not present in the setup should fallback to base implementation
         mock.Setup(m => m.GetPkgVersionAsync()).Returns(
@@ -79,7 +79,7 @@ public class GameIntegrityManagerTest {
         
         FileSystem.CopyDirectory(Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, SOURCE_DIRECTORY), Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, TARGET_DIRECTORY), true);
         
-        IGame game = new Game(settings);
+        IGame game = GameFactory.Create(settings);
         Mock<GameIntegrityManager> mock = new Mock<GameIntegrityManager>(game);
         mock.CallBase = true; // Methods who are not present in the setup should fallback to base implementation
         mock.Setup(m => m.GetPkgVersionAsync()).Returns(

@@ -70,7 +70,7 @@ public class GameTest {
     public void Init() {
 
         this.Settings = new GameSettings();
-        this.Game = new Game(this.Settings);
+        this.Game = GameFactory.Create(this.Settings);
 
     }
 
