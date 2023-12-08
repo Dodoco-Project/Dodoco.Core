@@ -20,27 +20,28 @@ namespace Dodoco.Core.Util.FileSystem {
 
         public static string Format(double bytes, DataUnitFormatterOption option) {
 
-            double resultNumber = 0.0D;
-            string resultString;
-            int i;
+            double _base = 1000;
+            double resultNumber = bytes;
+            int index = 0;
 
-            for (i = 0; i < units.Count && bytes >= DataUnit.KILOBYTE; i++, bytes /= DataUnit.KILOBYTE) {
-
-                resultNumber = bytes / DataUnit.KILOBYTE;
+            while (resultNumber >= _base) {
+                
+                resultNumber /= _base;
+                index++;
 
             }
 
-            resultString = $"{resultNumber:0.##}";
+            string resultString = (Math.Truncate(resultNumber * 100) / 100).ToString(System.Globalization.CultureInfo.InvariantCulture);
 
             switch (option) {
 
                 case DataUnitFormatterOption.USE_NONE:
                     break;
                 case DataUnitFormatterOption.USE_SYMBOL:
-                    resultString += $" {units[i].Item1}";
+                    resultString += $" {units[index].Item1}";
                     break;
                 case DataUnitFormatterOption.USE_FULLNAME:
-                    resultString += $" {units[i].Item2}";
+                    resultString += $" {units[index].Item2}";
                     break;
 
             }
