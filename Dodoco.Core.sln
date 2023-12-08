@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodoco.Core", "Source\Dodoc
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{E96BA084-120F-4A37-89C2-DFAC3CA6280B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodoco.Core.Test", "Test\Dodoco.Core.Test\Dodoco.Core.Test.csproj", "{0C0B8586-6CD5-422C-9F30-D85ADB85762A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dodoco.Core.Test", "Test\Dodoco.Core.Test.csproj", "{0C0B8586-6CD5-422C-9F30-D85ADB85762A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -15,7 +15,7 @@
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="../../Source/Dodoco.Core/Dodoco.Core.csproj" />
+        <ProjectReference Include="../Source/Dodoco.Core/Dodoco.Core.csproj" />
     </ItemGroup>
     <Target Name="COPY_TEST_STATIC_FILES" AfterTargets="AfterBuild;AfterPublish">
         <PropertyGroup>
