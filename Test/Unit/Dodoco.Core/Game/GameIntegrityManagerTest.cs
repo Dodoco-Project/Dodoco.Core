@@ -30,13 +30,9 @@ public class GameIntegrityManagerTest {
     public async Task GameIntegrityManager_GetInstallationIntegrityReportAsync_Test() {
 
         IGame game = GameFactory.Create(settings);
-        Mock<GameIntegrityManager> mock = new Mock<GameIntegrityManager>(game);
-        mock.CallBase = true; // Methods who are not present in the setup should fallback to base implementation
-        mock.Setup(m => m.GetPkgVersionAsync()).Returns(
-            Task.FromResult(PkgVersionParser.Parse(pkg_version))
-        );
+        IGameIntegrityManager integrityManager = GameIntegrityManagerFactory.Create(game);
 
-        List<GameFileIntegrityReport> filesToFix = await mock.Object.GetInstallationIntegrityReportAsync();
+        List<GameFileIntegrityReport> filesToFix = await integrityManager.GetInstallationIntegrityReportAsync(PkgVersionParser.Parse(pkg_version));
 
         Assert.IsTrue(filesToFix.Exists(someFile =>
             someFile.State == GameFileIntegrityState.MISSING
@@ -80,18 +76,14 @@ public class GameIntegrityManagerTest {
         FileSystem.CopyDirectory(Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, SOURCE_DIRECTORY), Path.Join(Util.TEST_STATIC_DIRECTOY_PATH, TARGET_DIRECTORY), true);
         
         IGame game = GameFactory.Create(settings);
-        Mock<GameIntegrityManager> mock = new Mock<GameIntegrityManager>(game);
-        mock.CallBase = true; // Methods who are not present in the setup should fallback to base implementation
-        mock.Setup(m => m.GetPkgVersionAsync()).Returns(
-            Task.FromResult(PkgVersionParser.Parse(pkg_version))
-        );
+        IGameIntegrityManager integrityManager = GameIntegrityManagerFactory.Create(game);
 
-        List<GameFileIntegrityReport> filesToFix = await mock.Object.GetInstallationIntegrityReportAsync();
-        List<GameFileIntegrityReport> fixedFiles = await mock.Object.RepairInstallationAsync(filesToFix);
+        List<GameFileIntegrityReport> filesToFix = await integrityManager.GetInstallationIntegrityReportAsync(PkgVersionParser.Parse(pkg_version));
+        List<GameFileIntegrityReport> fixedFiles = await integrityManager.RepairInstallationAsync(filesToFix);
         
         // If we check the installation again, there should be no missing/corrupted files
         
-        Assert.That((await mock.Object.GetInstallationIntegrityReportAsync()).Count, Is.EqualTo(0));
+        Assert.That((await integrityManager.GetInstallationIntegrityReportAsync(PkgVersionParser.Parse(pkg_version))).Count, Is.EqualTo(0));
 
     }
 

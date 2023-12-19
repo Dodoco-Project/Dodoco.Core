@@ -449,7 +449,7 @@ public class GameUpdateManager: IGameUpdateManager {
 
                 Task repairTask = new Task(async () => {
                 
-                    await integrityManager.RepairInstallationAsync(await integrityManager.GetInstallationIntegrityReportAsync(reporter, token), reporter, token);
+                    await integrityManager.RepairInstallationAsync(await integrityManager.GetInstallationIntegrityReportAsync(await this._Game.GetPkgVersionAsync(), reporter, token), reporter, token);
                 
                 });
                 

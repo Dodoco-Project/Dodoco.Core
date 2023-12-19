@@ -29,10 +29,10 @@ public class GameIntegrityManager: IGameIntegrityManager {
     public event EventHandler<GameIntegrityManagerState> OnStateUpdate = delegate {};
     
     /// <inheritdoc />
-    public virtual async Task<List<GameFileIntegrityReport>> GetInstallationIntegrityReportAsync() => await this.GetInstallationIntegrityReportAsync(null, CancellationToken.None);
+    public virtual async Task<List<GameFileIntegrityReport>> GetInstallationIntegrityReportAsync(List<GamePkgVersionEntry> entries) => await this.GetInstallationIntegrityReportAsync(entries, null, CancellationToken.None);
     
     /// <inheritdoc />
-    public virtual async Task<List<GameFileIntegrityReport>> GetInstallationIntegrityReportAsync(ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
+    public virtual async Task<List<GameFileIntegrityReport>> GetInstallationIntegrityReportAsync(List<GamePkgVersionEntry> entries, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
         GameIntegrityManagerState previousState = this.State;
 
@@ -41,15 +41,12 @@ public class GameIntegrityManager: IGameIntegrityManager {
             this.State = GameIntegrityManagerState.CHECKING_INTEGRITY;
             Logger.GetInstance().Log($"Starting game integrity check...");
 
-            var entries = new List<GamePkgVersionEntry>();
             var mismatches = new List<GameFileIntegrityReport>();
             double pkgVersionTotalPackageSize = 0;
             double totalBytesRead = 0;
             List<double> estimatedRemainingTime = new List<double>();
             Stopwatch watch = new Stopwatch();
             watch.Start();
-
-            entries = await this.GetPkgVersionAsync();
 
             pkgVersionTotalPackageSize = entries.Select(e => e.fileSize).Sum();
             Logger.GetInstance().Log($"pkg_version total size is {DataUnitFormatter.Format(pkgVersionTotalPackageSize)}");
@@ -222,24 +219,6 @@ public class GameIntegrityManager: IGameIntegrityManager {
         } finally {
 
             this.State = previousState;
-
-        }
-
-    }
-
-    /// <inheritdoc />
-    public virtual async Task<List<GamePkgVersionEntry>> GetPkgVersionAsync() {
-
-        Uri pkgVersionRemoteUrl = new Uri(UrlCombine.Combine((await this._Game.GetResourceAsync()).data.game.latest.decompressed_path.ToString(), "pkg_version"));
-        HttpResponseMessage response = await Client.GetInstance().FetchAsync(pkgVersionRemoteUrl);
-
-        if (response.IsSuccessStatusCode) {
-
-            return PkgVersionParser.Parse(await response.Content.ReadAsStringAsync());
-
-        } else {
-
-            throw new GameException($"Failed to fetch the pkg_version file from remote servers (received HTTP status code {response.StatusCode})");
 
         }
 

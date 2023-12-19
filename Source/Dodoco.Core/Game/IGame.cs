@@ -59,6 +59,15 @@ public interface IGame: IStatefulEntity<GameState> {
     Task<Version> GetGameVersionAsync();
 
     /// <summary>
+    /// Downloads and parses the pkg_version for the current game's version.
+    /// </summary>
+    /// <returns>
+    /// Returns a <see cref="System.Collections.Generic.List{T}(Dodoco.Core.Game.GamePkgVersionEntry)"/>
+    /// with all entries parsed from the pkg_version file.
+    /// </returns>
+    Task<List<GamePkgVersionEntry>> GetPkgVersionAsync();
+
+    /// <summary>
     /// Returns the <see cref="T:Dodoco.Core.Protocol.Company.Launcher.Resource.ResourceResponse"/>
     /// object used by current game version. This object can be obtained through the remote server when
     /// the game is either not installed or updated, by the <see cref="T:Dodoco.Core.Game.GameResourceCacheFile"/>

@@ -1,12 +1,14 @@
 namespace Dodoco.Core.Game;
 
 using Dodoco.Core.Embed;
+using Dodoco.Core.Network.HTTP;
 using Dodoco.Core.Network.Api.Company;
 using Dodoco.Core.Protocol.Company.Launcher.Resource;
 using Dodoco.Core.Util.FileSystem;
 using Dodoco.Core.Util.Log;
 using Dodoco.Core.Wine;
 
+using UrlCombineLib;
 using System;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -355,6 +357,24 @@ public class Game: IGame {
         }
 
         return null;
+
+    }
+
+    /// <inheritdoc />
+    public virtual async Task<List<GamePkgVersionEntry>> GetPkgVersionAsync() {
+
+        Uri pkgVersionRemoteUrl = new Uri(UrlCombine.Combine((await this.GetResourceAsync()).data.game.latest.decompressed_path.ToString(), "pkg_version"));
+        HttpResponseMessage response = await Client.GetInstance().FetchAsync(pkgVersionRemoteUrl);
+
+        if (response.IsSuccessStatusCode) {
+
+            return PkgVersionParser.Parse(await response.Content.ReadAsStringAsync());
+
+        } else {
+
+            throw new GameException($"Failed to fetch the pkg_version file from remote servers (received HTTP status code {response.StatusCode})");
+
+        }
 
     }
     

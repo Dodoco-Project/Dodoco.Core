@@ -163,19 +163,17 @@ public class GameUpdateManagerTest {
         this.Game.Settings.Server = GameServer.Global;
         this.Game.Settings.InstallationDirectory = targetDirectory;
 
-        Mock<GameIntegrityManager> integrityManagerMock = new Mock<GameIntegrityManager>(this.Game);
-        integrityManagerMock.CallBase = true;
-        integrityManagerMock.Setup(m => m.GetPkgVersionAsync()).Returns(Task.FromResult(
-            PkgVersionParser.Parse(
-                string.Join("\r\n", File.ReadAllLines(
-                    Path.Join(testRootDirectory, "/game_4.0.1/pkg_version")
-                    )
-                )
-            )
-        ));
+        IGameIntegrityManager integrityManager = GameIntegrityManagerFactory.Create(this.Game);
 
         Assert.That(
-            (await integrityManagerMock.Object.GetInstallationIntegrityReportAsync()).Count,
+            (await integrityManager.GetInstallationIntegrityReportAsync(
+                PkgVersionParser.Parse(
+                    string.Join("\r\n", File.ReadAllLines(
+                        Path.Join(testRootDirectory, "/game_4.0.1/pkg_version")
+                        )
+                    )
+                )
+            )).Count,
             Is.EqualTo(0),
             "The old version game installation must be upright in order to this test run"
         );
@@ -198,7 +196,7 @@ public class GameUpdateManagerTest {
             }
         ));
 
-        await updateManagerMock.Object.UpdateGameAsync(integrityManagerMock.Object);
+        await updateManagerMock.Object.UpdateGameAsync(integrityManager);
 
         // The game should be at version 4.1.0 now
 
@@ -241,12 +239,10 @@ public class GameUpdateManagerTest {
 
         }
 
-        Mock<GameIntegrityManager> anotherIntegrityManagerMock = new Mock<GameIntegrityManager>(this.Game);
-        anotherIntegrityManagerMock.CallBase = true;
-        anotherIntegrityManagerMock.Setup(m => m.GetPkgVersionAsync()).Returns(Task.FromResult(helperGetNewVersionPkgVersion()));
+        IGameIntegrityManager anotherIntegrityManager = GameIntegrityManagerFactory.Create(this.Game);
         
         Assert.That(
-            (await anotherIntegrityManagerMock.Object.GetInstallationIntegrityReportAsync()).Count,
+            (await anotherIntegrityManager.GetInstallationIntegrityReportAsync(helperGetNewVersionPkgVersion())).Count,
             Is.EqualTo(0),
             "The updated game should contain no errors i.e. all hdiff patches should have been successfully applied"
         );
@@ -274,7 +270,7 @@ public class GameUpdateManagerTest {
 
         Mock<GameIntegrityManager> integrityManagerMock = new Mock<GameIntegrityManager>(this.Game);
         integrityManagerMock.CallBase = true;
-        integrityManagerMock.Setup(m => m.GetInstallationIntegrityReportAsync()).Returns(Task.FromResult(new List<GameFileIntegrityReport>()));
+        integrityManagerMock.Setup(m => m.GetInstallationIntegrityReportAsync(new List<GamePkgVersionEntry>())).Returns(Task.FromResult(new List<GameFileIntegrityReport>()));
 
         Assert.That(async () => await updateManagerMock.Object.UpdateGameAsync(integrityManagerMock.Object), Throws.Exception.TypeOf<GameException>());
 
