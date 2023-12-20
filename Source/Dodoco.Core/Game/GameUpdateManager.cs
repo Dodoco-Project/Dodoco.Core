@@ -34,7 +34,7 @@ public class GameUpdateManager: IGameUpdateManager {
     /// Reads the game's update package <see cref="T:Dodoco.Core.Game.GameHdiffFiles"/> file
     /// and applies all hdiff patches for the listed files.
     /// </summary>
-    protected virtual async void ApplyGameUpdatePackagePatches(ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
+    protected virtual async Task ApplyGameUpdatePackagePatches(ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
         GameHDiffFiles hdiffFilesHandler = new GameHDiffFiles(this._Game.Settings.InstallationDirectory);
 
@@ -118,13 +118,11 @@ public class GameUpdateManager: IGameUpdateManager {
     /// matches that reported by the server, the file will not be download again; if the
     /// checksum doesn't matches, the package file will be overwritten.
     /// </summary>
-    protected virtual async Task DownloadUpdatePackageAsync(ResourceDiff diff, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
+    protected virtual async Task DownloadUpdatePackageAsync(ResourceDiff diff, string packagePath, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
         GameUpdateManagerState previousState = this.State;
 
         try {
-
-            string packageFileFullPath = Path.Join(this._Game.Settings.InstallationDirectory, diff.name);
 
             /*
              * Downloads the update's package or skips
@@ -133,7 +131,7 @@ public class GameUpdateManager: IGameUpdateManager {
 
             this.State = GameUpdateManagerState.DOWNLOADING_UPDATE_PACKAGE;
 
-            if (File.Exists(packageFileFullPath) && new Hash(MD5.Create()).ComputeHash(packageFileFullPath).ToUpper() == diff.md5.ToUpper()) {
+            if (File.Exists(packagePath) && new Hash(MD5.Create()).ComputeHash(packagePath).ToUpper() == diff.md5.ToUpper()) {
 
                 Logger.GetInstance().Log($"Found the game's update's package already inside the game's installation directory, skipping the download");
 
@@ -148,12 +146,12 @@ public class GameUpdateManager: IGameUpdateManager {
 
                     }
 
-                    await Client.GetInstance().DownloadFileAsync(new Uri(diff.path), packageFileFullPath, reporter, CancellationToken.None);
+                    await Client.GetInstance().DownloadFileAsync(new Uri(diff.path), packagePath, reporter, CancellationToken.None);
                     
                     Logger.GetInstance().Log($"Finished downloading the game's update package");
                     Logger.GetInstance().Log($"Checking game's update package's integrity...");
 
-                    string downloadedPackageFileChecksum = new Hash(MD5.Create()).ComputeHash(packageFileFullPath);
+                    string downloadedPackageFileChecksum = new Hash(MD5.Create()).ComputeHash(packagePath);
 
                     if (downloadedPackageFileChecksum.ToUpper() == diff.md5.ToUpper()) {
 
@@ -214,6 +212,26 @@ public class GameUpdateManager: IGameUpdateManager {
 
     }
 
+    /// <inheritdoc />
+    public virtual async Task<ResourceDiff> GetGameUpdatePackageDiffAsync(ResourceGame gameResource) {
+
+        Version currentVersion = await this._Game.GetGameVersionAsync();
+        Version remoteVersion = Version.Parse(gameResource.latest.version);
+        string packageFilenamePattern = this.GetGameUpdatePackageFilenamePattern(currentVersion, remoteVersion);
+        Predicate<ResourceDiff> desiredDiffObject = (diff) => Regex.IsMatch(diff.name, packageFilenamePattern);
+
+        if (gameResource.diffs.Exists(desiredDiffObject)) {
+
+            return gameResource.diffs.Find(desiredDiffObject);
+
+        } else {
+
+            throw new GameException($"Can't find a diff object whose name matchs the string pattern \"{packageFilenamePattern}\"");
+
+        }
+
+    }
+
     protected virtual string GetGameUpdatePackageFilenamePattern(Version currentVersion, Version targetVersion) {
 
         return @$"(game_{currentVersion.ToString().Replace(".", @"\.")}_{targetVersion.ToString().Replace(".", @"\.")}_hdiff_(\w*)\.zip)";
@@ -250,26 +268,16 @@ public class GameUpdateManager: IGameUpdateManager {
         try {
 
             ResourceGame gameResource = await this.GetGamePreUpdateAsync() ?? throw new GameException("Game pre-update is not available");
-            
-            Version currentVersion = await this._Game.GetGameVersionAsync();
+            ResourceDiff diff = await this.GetGameUpdatePackageDiffAsync(gameResource);
+            string packageFileFullPath = Path.Join(this._Game.Settings.InstallationDirectory, diff.name);
             Version remoteVersion = Version.Parse(gameResource.latest.version);
-            string packageFilenamePattern = this.GetGameUpdatePackageFilenamePattern(currentVersion, remoteVersion);
 
-            Logger.GetInstance().Log($"Pre-updating the game to version {remoteVersion.ToString()}...");
-
-            if (gameResource.diffs.Exists(d => Regex.IsMatch(d.name, packageFilenamePattern))) {
-
-                ResourceDiff diff = gameResource.diffs.Find(d => Regex.IsMatch(d.name, packageFilenamePattern));
-                string packageFileFullPath = Path.Join(this._Game.Settings.InstallationDirectory, diff.name);
-                await this.DownloadUpdatePackageAsync(diff, reporter, token);
-
-            } else {
-
-                throw new GameException($"Can't find a diff object whose name matchs the string pattern \"{packageFilenamePattern}\"");
-
-            }
+            Logger.GetInstance().Log($"Pre-updating the game to version {remoteVersion}...");
             
-            Logger.GetInstance().Log($"Sucessfully pre-updated the game to version {remoteVersion.ToString()}");
+            await this.DownloadUpdatePackageAsync(diff, packageFileFullPath, reporter, token);
+            
+            Logger.GetInstance().Log($"Sucessfully pre-updated the game to version {remoteVersion}");
+            
             this.State = previousState;
             return;
 
@@ -438,40 +446,23 @@ public class GameUpdateManager: IGameUpdateManager {
         try {
 
             ResourceGame gameResource = await this.GetGameUpdateAsync() ?? throw new GameException("Game update is not available");
-            
             Version currentVersion = await this._Game.GetGameVersionAsync();
             Version remoteVersion = Version.Parse(gameResource.latest.version);
-            string packageFilenamePattern = this.GetGameUpdatePackageFilenamePattern(currentVersion, remoteVersion);
-
-            Logger.GetInstance().Log($"Updating the game to version {remoteVersion.ToString()}...");
-
-            if (gameResource.diffs.Exists(d => Regex.IsMatch(d.name, packageFilenamePattern))) {
-
-                Task repairTask = new Task(async () => {
-                
-                    await integrityManager.RepairInstallationAsync(await integrityManager.GetInstallationIntegrityReportAsync(await this._Game.GetPkgVersionAsync(), reporter, token), reporter, token);
-                
-                });
-                
-                repairTask.Start();
-
-                ResourceDiff diff = gameResource.diffs.Find(d => Regex.IsMatch(d.name, packageFilenamePattern));
-                string packageFileFullPath = Path.Join(this._Game.Settings.InstallationDirectory, diff.name);
-                await this.DownloadUpdatePackageAsync(diff, reporter, token);
-                
-                await repairTask;
-                
-                this.UnzipGameUpdatePackage(packageFileFullPath, reporter, token);
-                this.ApplyGameUpdatePackagePatches(reporter, token);
-                this.RemoveGameDeprecatedFiles(reporter, token);
-
-            } else {
-
-                throw new GameException($"Can't find a diff object whose name matchs the string pattern \"{packageFilenamePattern}\"");
-
-            }
+            ResourceDiff diff = await this.GetGameUpdatePackageDiffAsync(gameResource);
+            string packageFileFullPath = Path.Join(this._Game.Settings.InstallationDirectory, diff.name);
             
-            Logger.GetInstance().Log($"Sucessfully updated the game to version {remoteVersion.ToString()}");
+            Logger.GetInstance().Log($"Updating the game to version {remoteVersion}...");
+
+            await Task.WhenAll(
+                integrityManager.RepairInstallationAsync(await integrityManager.GetInstallationIntegrityReportAsync(await this._Game.GetPkgVersionAsync(), reporter, token), reporter, token),
+                this.DownloadUpdatePackageAsync(diff, packageFileFullPath, reporter, token)
+            );
+            
+            this.UnzipGameUpdatePackage(packageFileFullPath, reporter, token);
+            await this.ApplyGameUpdatePackagePatches(reporter, token);
+            this.RemoveGameDeprecatedFiles(reporter, token);
+            
+            Logger.GetInstance().Log($"Sucessfully updated the game to version {remoteVersion}");
             this.State = previousState;
             return;
 

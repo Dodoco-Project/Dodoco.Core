@@ -20,6 +20,15 @@ public interface IGameUpdateManager: IStatefulEntity<GameUpdateManagerState> {
     Task<ResourceGame?> GetGameUpdateAsync();
 
     /// <summary>
+    /// Returns the diff object that will be used to update the game.
+    /// </summary>
+    /// <returns>
+    /// Returns a <see cref="T:Dodoco.Core.Protocol.Company.Launcher.Resource.ResourceDiff"/>
+    /// object if there is a diff object; otherwise <see langword="null"/>.
+    /// </returns>
+    Task<ResourceDiff> GetGameUpdatePackageDiffAsync(ResourceGame gameResource);
+
+    /// <summary>
     /// Verifies if the game's pre-update package is downloaded in the game's
     /// installation directory. NOTICE: this method doesn't compare the actual
     /// package checksum with the one returned by the server.
