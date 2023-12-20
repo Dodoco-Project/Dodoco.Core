@@ -144,7 +144,8 @@ public class GameUpdateManagerTest {
 
     }
 
-    [TestCaseSource(nameof(UpdateGameAsync_Test_Cases)), Description("Test updating an outdated game version to a new version")]
+    [TestCaseSource(nameof(UpdateGameAsync_Test_Cases))]
+    [Description("Test updating an outdated game version to a new version")]
     public async Task UpdateGameAsync_Test(string textDirectory) {
 
         // Copy the test files into a test directory
@@ -160,27 +161,33 @@ public class GameUpdateManagerTest {
 
         // The game installation will be set to the test directory
 
-        this.Game.Settings.Server = GameServer.Global;
-        this.Game.Settings.InstallationDirectory = targetDirectory;
+        GameSettings settings = new GameSettings {
+            Server = GameServer.Global,
+            InstallationDirectory = targetDirectory
+        };
 
-        IGameIntegrityManager integrityManager = GameIntegrityManagerFactory.Create(this.Game);
-
-        Assert.That(
-            (await integrityManager.GetInstallationIntegrityReportAsync(
-                PkgVersionParser.Parse(
-                    string.Join("\r\n", File.ReadAllLines(
-                        Path.Join(testRootDirectory, "/game_4.0.1/pkg_version")
-                        )
+        Mock<Game> gameMock = new Mock<Game>(settings);
+        gameMock.CallBase = true;
+        gameMock.Setup(g => g.GetPkgVersionAsync()).Returns(Task.FromResult(
+            PkgVersionParser.Parse(
+                string.Join("\r\n", File.ReadAllLines(
+                    Path.Join(testRootDirectory, "/game_4.0.1/pkg_version")
                     )
                 )
-            )).Count,
+            )
+        ));
+
+        IGameIntegrityManager integrityManager = GameIntegrityManagerFactory.Create(gameMock.Object);
+
+        Assert.That(
+            (await integrityManager.GetInstallationIntegrityReportAsync(await gameMock.Object.GetPkgVersionAsync())).Count,
             Is.EqualTo(0),
             "The old version game installation must be upright in order to this test run"
         );
 
         // Mocks GetGameUpdateAsync() to return a 4.1.0 ResourceGame
 
-        Mock<GameUpdateManager> updateManagerMock = new Mock<GameUpdateManager>(this.Game);
+        Mock<GameUpdateManager> updateManagerMock = new Mock<GameUpdateManager>(gameMock.Object);
         updateManagerMock.CallBase = true;
         updateManagerMock.Setup(m => m.GetGameUpdateAsync()).Returns(Task.FromResult(
             (ResourceGame?) new ResourceGame {
@@ -200,7 +207,7 @@ public class GameUpdateManagerTest {
 
         // The game should be at version 4.1.0 now
 
-        Assert.That(await this.Game.GetGameVersionAsync(), Is.EqualTo(Version.Parse("4.1.0")));
+        Assert.That(await gameMock.Object.GetGameVersionAsync(), Is.EqualTo(Version.Parse("4.1.0")));
 
         // Returns the fake local pkg_version instead that from ther server
 
@@ -216,21 +223,21 @@ public class GameUpdateManagerTest {
         foreach (GamePkgVersionEntry entry in helperGetNewVersionPkgVersion()) {
 
             Assert.That(
-                File.Exists(Path.Join(this.Settings.InstallationDirectory, entry.remoteName)),
+                File.Exists(Path.Join(settings.InstallationDirectory, entry.remoteName)),
                 Is.True,
                 "All files from the new version should exist"
             );
 
         }
         
-        GameDeleteFiles gameDeleteFiles = new GameDeleteFiles(this.Settings.InstallationDirectory);
+        GameDeleteFiles gameDeleteFiles = new GameDeleteFiles(settings.InstallationDirectory);
 
         if (gameDeleteFiles.Exist()) {
 
             foreach (var fileToDeletePath in gameDeleteFiles.Read()) {
 
                 Assert.That(
-                    File.Exists(Path.Join(this.Settings.InstallationDirectory, fileToDeletePath)),
+                    File.Exists(Path.Join(settings.InstallationDirectory, fileToDeletePath)),
                     Is.False,
                     "All deprecated files should have been removed from the new version"
                 );
@@ -239,7 +246,7 @@ public class GameUpdateManagerTest {
 
         }
 
-        IGameIntegrityManager anotherIntegrityManager = GameIntegrityManagerFactory.Create(this.Game);
+        IGameIntegrityManager anotherIntegrityManager = GameIntegrityManagerFactory.Create(gameMock.Object);
         
         Assert.That(
             (await anotherIntegrityManager.GetInstallationIntegrityReportAsync(helperGetNewVersionPkgVersion())).Count,
@@ -249,7 +256,8 @@ public class GameUpdateManagerTest {
 
     }
 
-    [Test, Description("UpdateGameAsync should throw an exception when unable to find a diff object whose name matchs the string pattern")]
+    [Test]
+    [Description("UpdateGameAsync should throw an exception when unable to find a diff object whose name matchs the string pattern")]
     public void UpdateGameAsync_Unable_To_Find_Diff_Test() {
 
         this.Game.Settings.Server = GameServer.Global;
@@ -276,7 +284,8 @@ public class GameUpdateManagerTest {
 
     }
 
-    [Test, Description("PreUpdateGameAsync should throw an exception when unable to find a diff object whose name matchs the string pattern")]
+    [Test]
+    [Description("PreUpdateGameAsync should throw an exception when unable to find a diff object whose name matchs the string pattern")]
     public void PreUpdateGameAsync_Unable_To_Find_Diff_Test() {
 
         this.Game.Settings.Server = GameServer.Global;
@@ -299,7 +308,8 @@ public class GameUpdateManagerTest {
 
     }
 
-    [TestCaseSource(nameof(IsGamePreUpdateDownloadedAsync_Test_Cases)), Description("Test the capacity to detect if the pre-update package is downloaded")]
+    [TestCaseSource(nameof(IsGamePreUpdateDownloadedAsync_Test_Cases))]
+    [Description("Test the capacity to detect if the pre-update package is downloaded")]
     public async Task IsGamePreUpdateDownloadedAsync_Test(GameServer server, string directory, bool expected) {
 
         this.Game.Settings.Server = server;
