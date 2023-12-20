@@ -19,4 +19,6 @@ public struct GameLanguage {
 
     };
 
+    public string PkgVersionFilename { get => $"Audio_{this.Name}_pkg_version"; }
+
 }
