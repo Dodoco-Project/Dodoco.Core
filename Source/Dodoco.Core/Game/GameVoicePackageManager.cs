@@ -14,15 +14,15 @@ using System.Text.RegularExpressions;
 /// <summary>
 /// Class <c>GameVoiceManager</c> contains methods to manage game's voices packages.
 /// </summary>
-public partial class GameVoiceManager: IGameVoiceManager {
+public partial class GameVoicePackageManager: IGameVoicePackageManager {
 
     protected readonly IGame Game;
 
-    protected GameVoiceManagerState _State = GameVoiceManagerState.IDLE;
-    public GameVoiceManagerState State {
+    protected GameVoicePackageManagerState _State = GameVoicePackageManagerState.IDLE;
+    public GameVoicePackageManagerState State {
         get => _State;
         protected set {
-            Logger.GetInstance().Debug($"Updating {nameof(GameVoiceManagerState)} from {_State} to {value}");
+            Logger.GetInstance().Debug($"Updating {nameof(GameVoicePackageManagerState)} from {_State} to {value}");
             _State = value;
         }
     }
@@ -30,7 +30,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
     [GeneratedRegex("(\\/)(Audio_)[a-zA-Z|(|)]+(_)([\\d]+.)+(zip)")]
     protected static partial Regex VoicePackageFilenamePattern();
     
-    public GameVoiceManager(IGame game) => Game = game;
+    public GameVoicePackageManager(IGame game) => Game = game;
 
     /// <inheritdoc />
     public virtual IEnumerable<GameLanguage> GetInstalledVoices() {
@@ -91,7 +91,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     protected virtual bool IsVoicePackageDownloaded(ResourceVoicePack voicePack, GameLanguage language) {
 
-        GameVoiceManagerState previousState = State;
+        GameVoicePackageManagerState previousState = State;
 
         try {
 
@@ -99,7 +99,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
             if (File.Exists(filepath)) {
 
-                this.State = GameVoiceManagerState.RECOVERING_DOWNLOADED_VOICE_PACKAGE;
+                this.State = GameVoicePackageManagerState.RECOVERING_DOWNLOADED_VOICE_PACKAGE;
                 Logger.GetInstance().Log($"Recovering the already downloaded voice package for the language \"{language.Name}\"...");
 
                 string checksum = new Hash(MD5.Create()).ComputeHash(filepath);
@@ -137,11 +137,11 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     protected virtual async Task DownloadVoicePackageAsync(ResourceVoicePack voicePack, string packagePath, GameLanguage language, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        GameVoiceManagerState previousState = State;
+        GameVoicePackageManagerState previousState = State;
 
         try {
 
-            this.State = GameVoiceManagerState.DOWNLOADING_VOICE_PACKAGE;
+            this.State = GameVoicePackageManagerState.DOWNLOADING_VOICE_PACKAGE;
             
             Logger.GetInstance().Log($"Downloading the voice package for the language \"{language.Name}\"...");
             
@@ -163,7 +163,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     protected virtual void UnzipVoicePackage(string packagePath, GameLanguage language, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        GameVoiceManagerState previousState = State;
+        GameVoicePackageManagerState previousState = State;
 
         try {
 
@@ -173,7 +173,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
             }
 
-            this.State = GameVoiceManagerState.UNZIPPING_VOICE_PACKAGE;
+            this.State = GameVoicePackageManagerState.UNZIPPING_VOICE_PACKAGE;
             Logger.GetInstance().Log($"Unzipping the voice package for the language \"{language.Name}\"...");
 
             using (FileStream zipFileStream = File.OpenRead(packagePath)) {
@@ -204,7 +204,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
     /// <inheritdoc />
     public virtual async Task InstallVoicePackageAsync(GameLanguage language, bool forceReinstall, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        if (this.State != GameVoiceManagerState.IDLE) {
+        if (this.State != GameVoicePackageManagerState.IDLE) {
 
             throw new GameException($"The voice package manager is busy");
 
@@ -273,7 +273,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     protected virtual async Task ApplyVoicePackageUpdatePatches(string packagePath, GameLanguage language, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        GameVoiceManagerState previousState = this.State;
+        GameVoicePackageManagerState previousState = this.State;
 
         try {
 
@@ -284,7 +284,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
                 if (hdiffListArchive != null) {
 
-                    this.State = GameVoiceManagerState.APPLYING_VOICE_PACKAGE_UPDATE;
+                    this.State = GameVoicePackageManagerState.APPLYING_VOICE_PACKAGE_UPDATE;
                     Logger.GetInstance().Log($"Applying the patches from the \"{language.Name}\" voice package...");
 
                     using (Stream hdiffListStream = hdiffListArchive.Open()) {
@@ -367,7 +367,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     protected virtual void RemoveVoicePackageDeprecatedFiles(string packagePath, GameLanguage language, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        GameVoiceManagerState previousState = this.State;
+        GameVoicePackageManagerState previousState = this.State;
 
         try {
 
@@ -378,7 +378,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
                 if (deprecatedFilesListArchive != null) {
 
-                    this.State = GameVoiceManagerState.REMOVING_DEPRECATED_FILES;
+                    this.State = GameVoicePackageManagerState.REMOVING_DEPRECATED_FILES;
                     Logger.GetInstance().Log($"Removing deprecated files from the \"{language.Name}\" voice package...");
 
                     using (Stream deprecatedFilesListStream = deprecatedFilesListArchive.Open()) {
@@ -443,13 +443,13 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     public virtual async Task UpdateVoicePackageAsync(IGameUpdateManager updateManager, IGameIntegrityManager integrityManager, GameLanguage language, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default) {
 
-        if (this.State != GameVoiceManagerState.IDLE) {
+        if (this.State != GameVoicePackageManagerState.IDLE) {
 
             throw new GameException($"The voice package manager is busy");
 
         }
         
-        GameVoiceManagerState previousState = State;
+        GameVoicePackageManagerState previousState = State;
 
         try {
 

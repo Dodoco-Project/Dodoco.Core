@@ -1,7 +1,7 @@
 
 namespace Dodoco.Core.Game;
 
-public enum GameVoiceManagerState {
+public enum GameVoicePackageManagerState {
 
     IDLE,
     RECOVERING_DOWNLOADED_VOICE_PACKAGE,

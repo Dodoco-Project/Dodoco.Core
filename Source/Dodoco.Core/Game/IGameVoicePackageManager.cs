@@ -2,7 +2,7 @@ namespace Dodoco.Core.Game;
 
 using Dodoco.Core.Protocol.Company.Launcher.Resource;
 
-public interface IGameVoiceManager {
+public interface IGameVoicePackageManager {
 
     /// <summary>
     /// Returns a list with all installed voices packages' languages for current game installation.
