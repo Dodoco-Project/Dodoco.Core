@@ -378,7 +378,7 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
                 if (deprecatedFilesListArchive != null) {
 
-                    this.State = GameVoiceManagerState.APPLYING_VOICE_PACKAGE_UPDATE;
+                    this.State = GameVoiceManagerState.REMOVING_DEPRECATED_FILES;
                     Logger.GetInstance().Log($"Removing deprecated files from the \"{language.Name}\" voice package...");
 
                     using (Stream deprecatedFilesListStream = deprecatedFilesListArchive.Open()) {
