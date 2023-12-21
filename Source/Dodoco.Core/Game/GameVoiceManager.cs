@@ -499,4 +499,21 @@ public partial class GameVoiceManager: IGameVoiceManager {
 
     }
 
+    public virtual void RemoveVoicePackage(GameLanguage language) {
+
+        if (!this.GetInstalledVoices().Contains(language)) {
+
+            throw new GameException($"The voice package for the language \"{language.Name}\" is not installed");
+
+        }
+
+        Logger.GetInstance().Log($"Removing the voice package for the language \"{language.Name}\"...");
+
+        string voicePackageDirectory = Path.Join(Game.Settings.InstallationDirectory, Game.GetDataDirectoryName(), "/StreamingAssets/AudioAssets/", language.Name);
+        Directory.Delete(voicePackageDirectory, true);
+        
+        Logger.GetInstance().Log($"Successfully removed the voice package for the language \"{language.Name}\"");
+
+    }
+
 }

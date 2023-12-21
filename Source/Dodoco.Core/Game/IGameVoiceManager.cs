@@ -23,4 +23,6 @@ public interface IGameVoiceManager {
 
     Task UpdateVoicePackageAsync(IGameUpdateManager updateManager, IGameIntegrityManager integrityManager, GameLanguage language, ProgressReporter<ProgressReport>? reporter, CancellationToken token = default);
 
+    void RemoveVoicePackage(GameLanguage language);
+
 }
